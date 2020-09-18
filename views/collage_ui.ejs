@@ -1,0 +1,88 @@
+<script>
+    const image_grid = $("#frameGridWrapper");
+    const modal = $("#collagePopup");
+    const open_collage_btn = $("#openCollageBtn");
+    const close_collage_btn = $(".close-modal");
+    const collage_canvas = $("#collageCanvas");
+
+    open_collage_btn.click(function () {
+        showModal();
+    });
+
+    close_collage_btn.click(function () {
+        hideModal();
+    });
+
+    $(window).click(function (e) {
+        if ($(e.target).is(modal)) {
+            hideModal();
+        }
+    });
+
+    function showModal() {
+        modal.css("display", "block");
+        image_grid.css('pointer-events', 'none');
+    }
+
+    function hideModal() {
+        modal.css("display", "none");
+        image_grid.css('pointer-events', 'auto');
+    }
+
+    function draggableAndResizable(elements, containment) {
+        elements.draggable({
+            containment: containment
+        });
+
+        elements.resizable({
+            containment: containment,
+            aspectRatio: true,
+        });
+    }
+
+    function deleteElementByUid(uid) {
+        var elem = document.getElementById(uid);
+        elem.remove();
+    }
+
+    function collageImageElement(uid, src) {
+        return $(
+            `<div id="${uid}" class="collage-image ui-widget-content">
+                <span class="delete" onclick="deleteElementByUid($(this).closest('div').attr('id'))">&times;</span>
+                <img src="${src}">
+            </div>`
+        );
+    }
+
+    var available_id = 0;
+    jQuery(document).on('paste', function (event) {
+        // use event.originalEvent.clipboard for newer chrome versions
+        var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+        console.log(JSON.stringify(items)); // will give you the mime types
+
+        // find pasted image among pasted items
+        var blob = null;
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf("image") === 0) {
+                blob = items[i].getAsFile();
+            }
+        }
+
+        // load image if there is a pasted image
+        if (blob !== null) {
+            var reader = new FileReader();
+            reader.onload = function (event) {
+                const encoded_image = event.target.result;
+                const collage_image = collageImageElement("image_" + available_id, encoded_image);
+                draggableAndResizable(collage_image, collage_canvas);
+    
+                collage_canvas.append(collage_image);
+                available_id++;
+            };
+            reader.readAsDataURL(blob);
+        }
+
+    });
+
+
+</script>
