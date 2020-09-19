@@ -37,6 +37,7 @@ SomHunterNapi::Init(Napi::Env env, Napi::Object exports)
 	  { InstanceMethod("getDisplay", &SomHunterNapi::get_display),
 	    InstanceMethod("addLikes", &SomHunterNapi::add_likes),
 	    InstanceMethod("rescore", &SomHunterNapi::rescore),
+	    InstanceMethod("rescore_collage", &SomHunterNapi::rescore_collage),
 	    InstanceMethod("resetAll", &SomHunterNapi::reset_all),
 	    InstanceMethod("removeLikes", &SomHunterNapi::remove_likes),
 	    InstanceMethod("autocompleteKeywords",
@@ -305,6 +306,34 @@ SomHunterNapi::rescore(const Napi::CallbackInfo &info)
 		                                               << std::endl);
 
 		somhunter->rescore(query);
+
+	} catch (const std::exception &e) {
+		Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
+	}
+
+	return Napi::Object{};
+}
+
+Napi::Value
+SomHunterNapi::rescore_collage(const Napi::CallbackInfo &info)
+{
+	Napi::Env env = info.Env();
+	Napi::HandleScope scope(env);
+
+	// Process arguments
+	int length = info.Length();
+
+	if (length != 1) {
+		Napi::TypeError::New(
+		  env,
+		  "Wrong number of parameters: SomHunterNapi::rescore_collage")
+		  .ThrowAsJavaScriptException();
+	}
+
+	try {
+		debug("API: CALL \n\t rescore_collage\n\t\t");
+
+		// TODO
 
 	} catch (const std::exception &e) {
 		Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();

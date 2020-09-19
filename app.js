@@ -26,6 +26,7 @@ const express = require("express");
 const session = require("express-session");
 const path = require("path");
 const cookieParser = require("cookie-parser");
+var bodyParser = require('body-parser');
 const morgan = require("morgan");
 const fs = require("fs");
 
@@ -97,13 +98,14 @@ if (process.env.NODE_ENV !== "production") {
 // Instantiate Express app
 const app = express();
 
+app.use(bodyParser.json({limit: "50mb"}));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+
 // Setup where EJS templates are stored
 app.set("views", path.join(__dirname, "views"));
 
 // Setup EJS engine for templates
 app.set("view engine", "ejs");
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -192,6 +194,7 @@ app.post("/submit_frame", endpoints.submitFrame);
 app.post("/reset_search_session", endpoints.resetSearchSession);
 
 app.post("/rescore", endpoints.rescore);
+app.post("/rescore_collage", endpoints.rescore_collage);
 app.post("/like_frame", endpoints.likeFrame);
 app.post("/unlike_frame", endpoints.unlikeFrame);
 

@@ -197,3 +197,26 @@ exports.unlikeFrame = function (req, res) {
 
   res.status(200).jsonp({ isLiked: false });
 };
+
+exports.rescore_collage = function (req, res) {
+  const sess = req.session;
+
+  const body = req.body;
+  const collectedImages = body.collectedImages;
+
+  const likes = SessionState.getLikes(sess.state);
+  const unlikes = SessionState.getUnlikes(sess.state);
+
+  // -------------------------------
+  // Call the core
+  global.core.addLikes(likes);
+  global.core.removeLikes(unlikes);
+  global.core.rescore_collage(collectedImages);
+  // -------------------------------
+
+  // Reset likes
+  SessionState.resetLikes(sess.state);
+  SessionState.resetUnlikes(sess.state);
+
+  res.status(200).jsonp({});
+};

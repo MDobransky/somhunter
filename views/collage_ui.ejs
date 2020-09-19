@@ -4,6 +4,7 @@
     const open_collage_btn = $("#openCollageBtn");
     const close_collage_btn = $(".close-modal");
     const collage_canvas = $("#collageCanvas");
+    var canvasImagesCollected = null;
 
     open_collage_btn.click(function () {
         showModal();
@@ -19,12 +20,48 @@
         }
     });
 
+    var available_id = 0;
+    $(document).on('paste', function (event) {
+        if (!collage_canvas.is(':visible')) {
+            return;
+        }
+
+        // use event.originalEvent.clipboard for newer chrome versions
+        var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+        console.log(JSON.stringify(items)); // will give you the mime types
+
+        // find pasted image among pasted items
+        var blob = null;
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf("image") === 0) {
+                blob = items[i].getAsFile();
+            }
+        }
+
+        // load image if there is a pasted image
+        if (blob !== null) {
+            var reader = new FileReader();
+            reader.onload = function (event) {
+                const encoded_image = event.target.result;
+                const collage_image = collageImageElement("image_" + available_id, encoded_image);
+                draggableAndResizable(collage_image, collage_canvas);
+
+                collage_canvas.append(collage_image);
+                available_id++;
+            };
+            reader.readAsDataURL(blob);
+        }
+
+    });
+
     function showModal() {
         modal.css("display", "block");
         image_grid.css('pointer-events', 'none');
     }
 
     function hideModal() {
+        canvasImagesCollected = collectCollageImages(); // collect the information before minimalizing the window
+
         modal.css("display", "none");
         image_grid.css('pointer-events', 'auto');
     }
@@ -54,35 +91,23 @@
         );
     }
 
-    var available_id = 0;
-    jQuery(document).on('paste', function (event) {
-        // use event.originalEvent.clipboard for newer chrome versions
-        var items = (event.clipboardData || event.originalEvent.clipboardData).items;
-        console.log(JSON.stringify(items)); // will give you the mime types
+    function collectCollageImages() {
+        const images = $(".collage-image");
 
-        // find pasted image among pasted items
-        var blob = null;
-        for (var i = 0; i < items.length; i++) {
-            if (items[i].type.indexOf("image") === 0) {
-                blob = items[i].getAsFile();
-            }
+        let images_information = [];
+        for (var i = 0; i < images.length; i++) {
+            const image = images.eq(i);
+            images_information.push({
+                src: image.children("img").attr("src"),
+                top: image.position().top / collage_canvas.height(),
+                left: image.position().left / collage_canvas.width(),
+                width: image.width() / collage_canvas.width(),
+                height: image.height() / collage_canvas.height()
+            });
         }
 
-        // load image if there is a pasted image
-        if (blob !== null) {
-            var reader = new FileReader();
-            reader.onload = function (event) {
-                const encoded_image = event.target.result;
-                const collage_image = collageImageElement("image_" + available_id, encoded_image);
-                draggableAndResizable(collage_image, collage_canvas);
-    
-                collage_canvas.append(collage_image);
-                available_id++;
-            };
-            reader.readAsDataURL(blob);
-        }
-
-    });
+        return images_information;
+    }
 
 
 </script>
