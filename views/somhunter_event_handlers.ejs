@@ -605,6 +605,18 @@ SOMHunter. If not, see <https://www.gnu.org/licenses/>.
     const reqData = {
       "collectedImages": canvasImagesCollected
     };
+    
+    $.ajax({
+      type: 'POST',
+      dataType: 'json',
+      url: "http://127.0.0.1:8000/position_similarity/somhunter", // TODO: fix path from config
+      data: {
+        "data": JSON.stringify(reqData),
+      },
+      success(response) {
+        console.log(response);
+      }
+    });
 
     // Make the request
     fetch("rescore_collage", {

@@ -201,8 +201,8 @@ exports.unlikeFrame = function (req, res) {
 exports.rescore_collage = function (req, res) {
   const sess = req.session;
 
-  const body = req.body;
-  const collectedImages = body.collectedImages;
+  // const body = req.body;
+  // const collectedImages = body.collectedImages;
 
   const likes = SessionState.getLikes(sess.state);
   const unlikes = SessionState.getUnlikes(sess.state);
@@ -211,7 +211,7 @@ exports.rescore_collage = function (req, res) {
   // Call the core
   global.core.addLikes(likes);
   global.core.removeLikes(unlikes);
-  global.core.rescore_collage(collectedImages);
+  global.core.rescore_collage(req.body);
   // -------------------------------
 
   // Reset likes
