@@ -304,7 +304,6 @@ SomHunterNapi::rescore(const Napi::CallbackInfo &info)
 	try {
 		debug("API: CALL \n\t rescore\n\t\t query =  " << query
 		                                               << std::endl);
-
 		somhunter->rescore(query);
 
 	} catch (const std::exception &e) {
@@ -329,11 +328,14 @@ SomHunterNapi::rescore_collage(const Napi::CallbackInfo &info)
 		  "Wrong number of parameters: SomHunterNapi::rescore_collage")
 		  .ThrowAsJavaScriptException();
 	}
+	Napi::Float32Array query = info[0].As<Napi::Float32Array>();
+	std::vector<_Float32> scores;
+	for(std::size_t i = 0; i < query.ElementLength(); i++)
+		scores.push_back(query[i]);
 
 	try {
-		debug("API: CALL \n\t rescore_collage\n\t\t");
-
-		// TODO
+		debug("API: CALL \n\t rescore_collage\n\t\t query " << std::endl);
+		somhunter->rescore(scores);
 
 	} catch (const std::exception &e) {
 		Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();

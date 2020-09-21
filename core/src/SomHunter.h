@@ -102,6 +102,7 @@ public:
 	 * computation and updates context.
 	 */
 	void rescore(const std::string &text_query);
+	void rescore(const std::vector<_Float32> &);
 
 	bool som_ready() const;
 

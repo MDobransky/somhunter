@@ -215,6 +215,7 @@ SOMHunter. If not, see <https://www.gnu.org/licenses/>.
       q0: q0,
       q1: q1,
     };
+    console.log(JSON.stringify(reqData))
 
     // Make the request
     fetch("rescore", {
@@ -605,6 +606,8 @@ SOMHunter. If not, see <https://www.gnu.org/licenses/>.
     const reqData = {
       "collectedImages": canvasImagesCollected
     };
+
+    let response = {};
     
     $.ajax({
       type: 'POST',
@@ -613,18 +616,25 @@ SOMHunter. If not, see <https://www.gnu.org/licenses/>.
       data: {
         "data": JSON.stringify(reqData),
       },
-      success(response) {
-        console.log(response);
-      }
+      success(resp) {
+        console.log(resp);
+        response = resp;
+      },
+      async: false
     });
 
+    //Float32Array.from(response.distances); 
+
+    let sent = JSON.stringify(response.distances);
+    console.log(sent);
+  
     // Make the request
     fetch("rescore_collage", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(reqData),
+      body: sent,
     })
       .then((res) => {
         if (!res.ok) { throw Error(res.statusText); }

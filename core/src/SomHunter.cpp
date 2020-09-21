@@ -148,6 +148,69 @@ SomHunter::rescore(const std::string &text_query)
 	                                 config.topn_frames_per_shot);
 }
 
+void SomHunter::rescore(const std::vector<_Float32> &collage_scores)
+{
+	debug("API: CALL \n\t rescore scores" << std::endl);
+	submitter.poll();
+
+	// Rescore text query
+	// keywords.rank_sentence_query(query, scores, features, frames, config);
+
+	std::vector<std::pair<ImageId, float>> img_scores;
+	for (size_t img_ID = 0; img_ID < features.size(); ++img_ID) {
+
+		float dist = collage_scores[img_ID];
+		img_scores.emplace_back(ImageId(img_ID), dist);
+	}
+
+	std::sort(img_scores.begin(),
+	          img_scores.end(),
+	          [](const std::pair<size_t, float> &left,
+	             const std::pair<size_t, float> &right) {
+		          return left.second < right.second;
+	          });
+
+	for (auto &&[frame_ID, dist] : img_scores) {
+		scores.adjust(frame_ID, dist);
+	}
+
+	scores.normalize();
+
+
+
+	// Rescore relevance feedback
+	rescore_feedback();
+
+	// Start SOM computation
+	som_start();
+
+	// Update search context
+	shown_images.clear();
+
+	// Reset likes
+	// likes.clear();
+	// for (auto &fr : frames) {
+	// 	fr.liked = false;
+	// }
+
+	auto top_n = scores.top_n(frames,
+	                          TOPN_LIMIT,
+	                          config.topn_frames_per_video,
+	                          config.topn_frames_per_shot);
+
+	// debug("used_tools.topknn_used = " << used_tools.topknn_used);
+	// debug("used_tools.KWs_used = " << used_tools.KWs_used);
+	// debug("used_tools.bayes_used = " << used_tools.bayes_used);
+	submitter.submit_and_log_rescore(frames,
+	                                 scores,
+	                                 used_tools,
+	                                 current_display_type,
+	                                 top_n,
+	                                 last_text_query,
+	                                 config.topn_frames_per_video,
+	                                 config.topn_frames_per_shot);
+}
+
 bool
 SomHunter::som_ready() const
 {
