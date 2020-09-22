@@ -27,7 +27,7 @@
     "fr_filename_frame_num_len": 8
   },
 
-  "frames_list_file": "V3C1_20191215.keyframes.dataset",
+  "frames_list_file": "data/ITEC_w2vv/ITEC.keyframes.dataset",
   "frames_path_prefix": "thumbs/",
 
   "features_file_data_off": 12,

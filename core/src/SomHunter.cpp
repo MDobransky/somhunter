@@ -152,6 +152,7 @@ void SomHunter::rescore(const std::vector<_Float32> &collage_scores)
 {
 	debug("API: CALL \n\t rescore scores" << std::endl);
 	submitter.poll();
+	reset_scores();
 
 	// Rescore text query
 	// keywords.rank_sentence_query(query, scores, features, frames, config);
@@ -159,39 +160,38 @@ void SomHunter::rescore(const std::vector<_Float32> &collage_scores)
 	std::vector<std::pair<ImageId, float>> img_scores;
 	for (size_t img_ID = 0; img_ID < features.size(); ++img_ID) {
 
-		float dist = collage_scores[img_ID];
-		img_scores.emplace_back(ImageId(img_ID), dist);
+		// float dist = collage_scores[img_ID];
+		// img_scores.emplace_back(ImageId(img_ID), dist);
+		scores.set(img_ID, 1 - collage_scores[img_ID]);
 	}
 
-	std::sort(img_scores.begin(),
-	          img_scores.end(),
-	          [](const std::pair<size_t, float> &left,
-	             const std::pair<size_t, float> &right) {
-		          return left.second < right.second;
-	          });
+	// std::sort(img_scores.begin(),
+	//           img_scores.end(),
+	//           [](const std::pair<size_t, float> &left,
+	//              const std::pair<size_t, float> &right) {
+	// 	          return left.second < right.second;
+	//           });
+	// for (auto &&[frame_ID, dist] : img_scores) {
+	// 	scores.set(frame_ID, 1 - dist);
+	// 	// std::exp(dist * -42)
+	// }
 
-	for (auto &&[frame_ID, dist] : img_scores) {
-		scores.adjust(frame_ID, dist);
-	}
-
-	scores.normalize();
-
-
+	// scores.normalize();
 
 	// Rescore relevance feedback
-	rescore_feedback();
+	// rescore_feedback();
 
 	// Start SOM computation
-	som_start();
+	// som_start();
 
 	// Update search context
 	shown_images.clear();
 
 	// Reset likes
-	// likes.clear();
-	// for (auto &fr : frames) {
-	// 	fr.liked = false;
-	// }
+	likes.clear();
+	for (auto &fr : frames) {
+		fr.liked = false;
+	}
 
 	auto top_n = scores.top_n(frames,
 	                          TOPN_LIMIT,
@@ -208,7 +208,7 @@ void SomHunter::rescore(const std::vector<_Float32> &collage_scores)
 	                                 top_n,
 	                                 last_text_query,
 	                                 config.topn_frames_per_video,
-	                                 config.topn_frames_per_shot);
+	                                 config.topn_frames_per_shot);	
 }
 
 bool
