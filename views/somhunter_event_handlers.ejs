@@ -626,10 +626,11 @@ SOMHunter. If not, see <https://www.gnu.org/licenses/>.
     });
 
     //Float32Array.from(response.distances);
-    console.log("Score received") 
+    // console.log("Score received") 
+    // console.log(response.distances);
 
-    let sent = JSON.stringify(response.distances);
-    console.log(sent);
+    // let sent = JSON.stringify(response.distances);
+    // console.log(sent);
   
     // Make the request
     fetch("rescore_collage", {
@@ -637,7 +638,7 @@ SOMHunter. If not, see <https://www.gnu.org/licenses/>.
       headers: {
         "Content-Type": "application/json",
       },
-      body: sent,
+      body: JSON.stringify(response),
     })
       .then((res) => {
         if (!res.ok) { throw Error(res.statusText); }

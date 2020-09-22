@@ -23,6 +23,9 @@
 #include "SomHunterNapi.h"
 
 #include <stdexcept>
+#include <vector>
+#include <sstream>
+#include <string>
 
 Napi::FunctionReference SomHunterNapi::constructor;
 
@@ -330,10 +333,23 @@ SomHunterNapi::rescore_collage(const Napi::CallbackInfo &info)
 		  "Wrong number of parameters: SomHunterNapi::rescore_collage")
 		  .ThrowAsJavaScriptException();
 	}
-	Napi::Float32Array query = info[0].As<Napi::Float32Array>();
+	// Napi::Float32Array query = info[0].As<Napi::Float32Array>();
+	// std::vector<_Float32> scores;
+	// for(std::size_t i = 0; i < query.ElementLength(); i++)
+	// 	scores.push_back(query[i]);
+	std::string query{ info[0].As<Napi::String>().Utf8Value() };
 	std::vector<_Float32> scores;
-	for(std::size_t i = 0; i < query.ElementLength(); i++)
-		scores.push_back(query[i]);
+	std::stringstream ss(query);
+
+	std::string one;
+	while(std::getline(ss, one, ';'))
+	{
+		std::stringstream ssl(one);
+		float val;
+		ssl >> val;
+		scores.push_back(val);
+	}
+
 
 	try {
 		debug("API: CALL \n\t rescore_collage\n\t\t query " << std::endl);
