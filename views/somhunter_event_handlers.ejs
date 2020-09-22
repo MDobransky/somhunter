@@ -608,11 +608,13 @@ SOMHunter. If not, see <https://www.gnu.org/licenses/>.
     };
 
     let response = {};
+    let host = window.location.protocol +'//'+window.location.hostname
     
     $.ajax({
       type: 'POST',
       dataType: 'json',
-      url: "http://127.0.0.1:8000/position_similarity/somhunter", // TODO: fix path from config
+      crossDomain: true,
+      url: host + ":8000/position_similarity/somhunter", // TODO: fix path from config
       data: {
         "data": JSON.stringify(reqData),
       },
@@ -623,7 +625,8 @@ SOMHunter. If not, see <https://www.gnu.org/licenses/>.
       async: false
     });
 
-    //Float32Array.from(response.distances); 
+    //Float32Array.from(response.distances);
+    console.log("Score received") 
 
     let sent = JSON.stringify(response.distances);
     console.log(sent);

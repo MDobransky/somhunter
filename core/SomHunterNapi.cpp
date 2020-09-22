@@ -316,6 +316,8 @@ SomHunterNapi::rescore(const Napi::CallbackInfo &info)
 Napi::Value
 SomHunterNapi::rescore_collage(const Napi::CallbackInfo &info)
 {
+	debug("API: CALL \n\t rescore_collage\n\t\t query " << std::endl);
+	
 	Napi::Env env = info.Env();
 	Napi::HandleScope scope(env);
 
