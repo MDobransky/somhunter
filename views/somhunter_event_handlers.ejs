@@ -604,17 +604,18 @@ SOMHunter. If not, see <https://www.gnu.org/licenses/>.
   function rescore_collage() {
     // Request input data
     const reqData = {
-      "collectedImages": canvasImagesCollected
+      "collectedImages": canvasImagesCollected,
+      // "topn": 3,
     };
 
     let response = {};
-    let host = window.location.protocol +'//'+window.location.hostname
+    let host = window.location.protocol + '//' + window.location.hostname // TODO: fix path from config
     
     $.ajax({
       type: 'POST',
       dataType: 'json',
       crossDomain: true,
-      url: host + ":8000/position_similarity/somhunter", // TODO: fix path from config
+      url: host + ":8000/position_similarity/somhunter", 
       data: {
         "data": JSON.stringify(reqData),
       },
