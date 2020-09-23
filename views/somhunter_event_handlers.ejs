@@ -605,7 +605,7 @@ SOMHunter. If not, see <https://www.gnu.org/licenses/>.
     // Request input data
     const reqData = {
       "collectedImages": canvasImagesCollected,
-      // "topn": 3,
+      "topn": 1000,
     };
 
     let response = {};
@@ -625,13 +625,6 @@ SOMHunter. If not, see <https://www.gnu.org/licenses/>.
       },
       async: false
     });
-
-    //Float32Array.from(response.distances);
-    // console.log("Score received") 
-    // console.log(response.distances);
-
-    // let sent = JSON.stringify(response.distances);
-    // console.log(sent);
   
     // Make the request
     fetch("rescore_collage", {

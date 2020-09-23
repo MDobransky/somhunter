@@ -39,10 +39,10 @@ public:
 	  : scores(p.size(), 1.0f)
 	{}
 
-	void reset()
+	void reset(float val = 1.0f)
 	{
 		for (auto &i : scores)
-			i = 1.0f;
+			i = val;
 	}
 
 	// hard remove image

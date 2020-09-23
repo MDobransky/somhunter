@@ -102,7 +102,7 @@ public:
 	 * computation and updates context.
 	 */
 	void rescore(const std::string &text_query);
-	void rescore(const std::vector<_Float32> &);
+	void rescore(const std::vector<_Float32> &, const std::vector<size_t> &);
 
 	bool som_ready() const;
 
@@ -146,6 +146,7 @@ private:
 	FramePointerRange get_page_from_last(PageId page);
 
 	void reset_scores();
+	void reset_scores(float);
 };
 
 #endif

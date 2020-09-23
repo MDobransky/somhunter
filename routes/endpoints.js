@@ -210,7 +210,7 @@ exports.rescore_collage = function (req, res) {
   // Call the core
   global.core.addLikes(likes);
   global.core.removeLikes(unlikes);
-  global.core.rescore_collage(req.body.distances);
+  global.core.rescore_collage(req.body.distances, req.body.idxs);
   // -------------------------------
 
   // Reset likes

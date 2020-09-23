@@ -327,7 +327,7 @@ SomHunterNapi::rescore_collage(const Napi::CallbackInfo &info)
 	// Process arguments
 	int length = info.Length();
 
-	if (length != 1) {
+	if (length != 2) {
 		Napi::TypeError::New(
 		  env,
 		  "Wrong number of parameters: SomHunterNapi::rescore_collage")
@@ -337,23 +337,22 @@ SomHunterNapi::rescore_collage(const Napi::CallbackInfo &info)
 	// std::vector<_Float32> scores;
 	// for(std::size_t i = 0; i < query.ElementLength(); i++)
 	// 	scores.push_back(query[i]);
-	std::string query{ info[0].As<Napi::String>().Utf8Value() };
+	std::string s_scores{ info[0].As<Napi::String>().Utf8Value()};
+	std::string s_indices{info[1].As<Napi::String>().Utf8Value()};
 	std::vector<_Float32> scores;
-	std::stringstream ss(query);
+	std::vector<size_t> indices;
+	std::stringstream ss(s_scores);
 
 	std::string one;
 	while(std::getline(ss, one, ';'))
-	{
-		std::stringstream ssl(one);
-		float val;
-		ssl >> val;
-		scores.push_back(val);
-	}
-
+		scores.push_back(std::stof(one));
+	ss = std::stringstream(s_indices);
+	while(std::getline(ss, one, ';'))
+		indices.push_back(std::stoull(one));
 
 	try {
-		debug("API: CALL \n\t rescore_collage\n\t\t query " << std::endl);
-		somhunter->rescore(scores);
+		debug("API: CALL \n\t rescore_collage\n\t\t " << std::endl);
+		somhunter->rescore(scores, indices);
 
 	} catch (const std::exception &e) {
 		Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();

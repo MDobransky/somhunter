@@ -148,41 +148,18 @@ SomHunter::rescore(const std::string &text_query)
 	                                 config.topn_frames_per_shot);
 }
 
-void SomHunter::rescore(const std::vector<_Float32> &collage_scores)
+void SomHunter::rescore(const std::vector<_Float32> &collage_scores, const std::vector<size_t> &indices)
 {
 	debug("API: CALL \n\t rescore scores" << std::endl);
 	submitter.poll();
-	reset_scores();
+	reset_scores(0.0f);
 
 	// Rescore text query
 	// keywords.rank_sentence_query(query, scores, features, frames, config);
 
-	std::vector<std::pair<ImageId, float>> img_scores;
-	for (size_t img_ID = 0; img_ID < features.size(); ++img_ID) {
-
-		// float dist = collage_scores[img_ID];
-		// img_scores.emplace_back(ImageId(img_ID), dist);
-		scores.set(img_ID, 1 - collage_scores[img_ID]);
+	for (size_t i = 0; i < indices.size(); ++i) {
+		scores.set(indices[i], 1 - collage_scores[i]);
 	}
-
-	// std::sort(img_scores.begin(),
-	//           img_scores.end(),
-	//           [](const std::pair<size_t, float> &left,
-	//              const std::pair<size_t, float> &right) {
-	// 	          return left.second < right.second;
-	//           });
-	// for (auto &&[frame_ID, dist] : img_scores) {
-	// 	scores.set(frame_ID, 1 - dist);
-	// 	// std::exp(dist * -42)
-	// }
-
-	// scores.normalize();
-
-	// Rescore relevance feedback
-	// rescore_feedback();
-
-	// Start SOM computation
-	// som_start();
 
 	// Update search context
 	shown_images.clear();
@@ -464,8 +441,15 @@ SomHunter::get_page_from_last(PageId page)
 	return res;
 }
 
+
 void
 SomHunter::reset_scores()
+{
+ reset_scores(1.0f);
+}
+
+void
+SomHunter::reset_scores(float val = 1.0f)
 {
 	used_tools.reset();
 
@@ -479,5 +463,5 @@ SomHunter::reset_scores()
 
 	last_text_query = "";
 
-	scores.reset();
+	scores.reset(val);
 }
