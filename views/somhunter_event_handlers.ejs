@@ -610,52 +610,56 @@ SOMHunter. If not, see <https://www.gnu.org/licenses/>.
 
     let response = {};
     let host = window.location.protocol + '//' + window.location.hostname // TODO: fix path from config
-    
+
     $.ajax({
       type: 'POST',
       dataType: 'json',
       crossDomain: true,
-      url: host + ":8000/position_similarity/somhunter", 
+      url: host + ":8000/position_similarity/somhunter",
       data: {
         "data": JSON.stringify(reqData),
       },
-      success(resp) {
-        console.log(resp);
-        response = resp;
-      },
-      async: false
-    });
-  
-    // Make the request
-    fetch("rescore_collage", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(response),
-    })
-      .then((res) => {
-        if (!res.ok) { throw Error(res.statusText); }
-        return res.json()
-      })
-      .then((data) => {
-        // Handle error
-        if (data.error) {
-          throw Error(data.error.message);
-        }
+      success(response) {
+        // Call SomHunter with Grizzly successful response
+        fetch("rescore_collage", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(response),
+        })
+          .then((res) => {
+            if (!res.ok) { throw Error(res.statusText); }
+            return res.json()
+          })
+          .then((data) => {
+            // Handle error
+            if (data.error) {
+              throw Error(data.error.message);
+            }
 
-        // Now request new display
-        showTopDisplay();
-      })
-      .catch((e) => {
-        console.log("Error: " + JSON.stringify(e.message));
+            // Now request new display
+            showTopDisplay();
+          })
+          .catch((e) => {
+            console.log("Error: " + JSON.stringify(e.message));
+            showGlobalMessage(
+              "Request failed!",
+              JSON.stringify(e.message),
+              5000,
+              "e"
+            );
+          });
+      },
+      error(resp) {
         showGlobalMessage(
           "Request failed!",
-          JSON.stringify(e.message),
+          "Grizzly error: " + resp.responseJSON['message'],
           5000,
           "e"
         );
-      });
+      },
+    });
   }
 
 </script>
