@@ -1,30 +1,16 @@
 <script>
-    const image_grid = $("#frameGridWrapper");
-    const modal = $("#collagePopup");
-    const open_collage_btn = $("#openCollageBtn");
-    const close_collage_btn = $(".close-modal");
-    const collage_canvas = $("#collageCanvas");
-    var canvasImagesCollected = null;
+    const collage_temporal_queries = $("#collageTemporalQueries");
+    const collage_canvases = $(".collage-canvas");
 
-    open_collage_btn.click(function () {
-        showModal();
+    collage_canvases.click(function () {
+        collage_canvases.removeClass("paste-active");
+        $(this).addClass("paste-active");
     });
 
-    close_collage_btn.click(function () {
-        hideModal();
-    });
-
-    $(window).click(function (e) {
-        if ($(e.target).is(modal)) {
-            hideModal();
-        }
-    });
 
     var available_id = 0;
     $(document).on('paste', function (event) {
-        if (!collage_canvas.is(':visible')) {
-            return;
-        }
+        const active_canvas = $(".paste-active");
 
         // use event.originalEvent.clipboard for newer chrome versions
         var items = (event.clipboardData || event.originalEvent.clipboardData).items;
@@ -43,27 +29,15 @@
             reader.onload = function (event) {
                 const encoded_image = event.target.result;
                 const collage_image = collageImageElement("image_" + available_id, encoded_image);
-                draggableAndResizable(collage_image, collage_canvas);
+                draggableAndResizable(collage_image, active_canvas);
 
-                collage_canvas.append(collage_image);
+                active_canvas.append(collage_image);
                 available_id++;
             };
             reader.readAsDataURL(blob);
         }
 
     });
-
-    function showModal() {
-        modal.css("display", "block");
-        image_grid.css('pointer-events', 'none');
-    }
-
-    function hideModal() {
-        canvasImagesCollected = collectCollageImages(); // collect the information before minimalizing the window
-
-        modal.css("display", "none");
-        image_grid.css('pointer-events', 'auto');
-    }
 
     function draggableAndResizable(elements, containment) {
         elements.draggable({
@@ -90,8 +64,12 @@
         );
     }
 
-    function collectCollageImages() {
-        const images = $(".collage-image");
+    function collectCollage(idx) {
+        return collectCollageImages($(collage_canvases[idx]))
+    }
+
+    function collectCollageImages(collage_canvas) {
+        const images = collage_canvas.find(".collage-image");
 
         let images_information = [];
         for (var i = 0; i < images.length; i++) {
