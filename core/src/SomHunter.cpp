@@ -158,6 +158,9 @@ void SomHunter::rescore(const std::vector<_Float32> &collage_scores, const std::
 	// keywords.rank_sentence_query(query, scores, features, frames, config);
 
 	for (size_t i = 0; i < indices.size(); ++i) {
+		if(indices[i] >= scores.size()) {
+			continue;
+		}
 		scores.set(indices[i], 1 - collage_scores[i]);
 	}
 
