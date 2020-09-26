@@ -86,15 +86,17 @@ SOMHunter. If not, see <https://www.gnu.org/licenses/>.
 
         <div id="collageTemporalQueries">
           <p class="inter-query-text"> Firstly</p>
-          <div id="collage_first" class="collage-canvas rectangle paste-active"> </div>
+          <div class="canvas-wrapper">
+            <div id="collage_first" class="collage-canvas paste-active"> </div>
+          </div>
           <p class="inter-query-text"> ... and then ...</p>
-          <div id="collage_second" class="collage-canvas rectangle"> </div>
+          <div class="canvas-wrapper">
+            <div id="collage_second" class="collage-canvas"> </div>
+          </div>
         </div>
 
-        <div class="small-6 cell">
-          <button id="searchByCollageBtn" class="button block-btn rescore-btn"
+        <button id="searchByCollageBtn" class="button block-btn rescore-btn"
             onclick="rescore_collage()">Rescore</button>
-        </div>
       </div>
 
       <!-- ---------------------------------- -->
@@ -114,7 +116,7 @@ SOMHunter. If not, see <https://www.gnu.org/licenses/>.
               <a id="btnTopn" onclick="showTopDisplay()" class="active button block-btn top-ranked-btn">Top-ranked</a>
             </div>
 
-            <div class="small-6 cell">
+            <div class="small-6 cell" style="display:none">
               <a id="btnDetail" class="button block-btn detail-btn">Detail</a>
             </div>
 

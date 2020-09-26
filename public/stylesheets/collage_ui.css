@@ -21,10 +21,11 @@
 
 .collage-canvas {
     background-color: lightgrey;
-    margin: 15px auto;
-    width: 360px;
-    height: 202px;
-    position: relative;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    position: absolute;
 }
 
 .collage-image {
@@ -52,4 +53,15 @@
 .collage-search .inter-query-text {
     text-align: center;
     margin: auto;
+}
+
+.canvas-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; 
+    margin-bottom: 15px;
+}
+
+.collage-search {
+    margin: auto;
+    width: 96%;
 }
