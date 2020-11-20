@@ -21,6 +21,7 @@
 #include "common.h"
 
 #include "SomHunterNapi.h"
+#include "Collage.h"
 
 #include <stdexcept>
 #include <vector>
@@ -327,32 +328,55 @@ SomHunterNapi::rescore_collage(const Napi::CallbackInfo &info)
 	// Process arguments
 	int length = info.Length();
 
-	if (length != 2) {
+	if (length != 8) {
 		Napi::TypeError::New(
 		  env,
 		  "Wrong number of parameters: SomHunterNapi::rescore_collage")
 		  .ThrowAsJavaScriptException();
 	}
-	// Napi::Float32Array query = info[0].As<Napi::Float32Array>();
-	// std::vector<_Float32> scores;
-	// for(std::size_t i = 0; i < query.ElementLength(); i++)
-	// 	scores.push_back(query[i]);
-	std::string s_scores{ info[0].As<Napi::String>().Utf8Value()};
-	std::string s_indices{info[1].As<Napi::String>().Utf8Value()};
-	std::vector<_Float32> scores;
-	std::vector<size_t> indices;
-	std::stringstream ss(s_scores);
+	Napi::Float32Array js_lefts = info[0].As<Napi::Float32Array>();
+	Napi::Float32Array js_tops = info[1].As<Napi::Float32Array>();
+	Napi::Float32Array js_heights = info[2].As<Napi::Float32Array>();
+	Napi::Float32Array js_widths = info[3].As<Napi::Float32Array>();
+	Napi::Int32Array js_p_heights = info[4].As<Napi::Int32Array>();
+	Napi::Int32Array js_p_widths = info[5].As<Napi::Int32Array>();
+	Napi::Int32Array js_break_point = info[6].As<Napi::Int32Array>();
+	Napi::Uint8Array js_concat_pics = info[7].As<Napi::Uint8Array>();
 
-	std::string one;
-	while(std::getline(ss, one, ';'))
-		scores.push_back(std::stof(one));
-	ss = std::stringstream(s_indices);
-	while(std::getline(ss, one, ';'))
-		indices.push_back(std::stoull(one));
+
+	Collage collage;
+
+	for(std::size_t i = 0; i < js_lefts.ElementLength(); i++)
+	{
+		collage.lefts.push_back(js_lefts[i]);
+		collage.tops.push_back(js_tops[i]);
+		collage.heights.push_back(js_heights[i]);
+		collage.widths.push_back(js_widths[i]);
+		collage.p_heights.push_back(js_p_heights[i]);
+		collage.p_widths.push_back(js_p_widths[i]);
+	}
+	collage.break_point = js_break_point[0];
+
+	for(std::size_t i = 0; i < collage.p_heights.size(); i++)
+	{
+		std::vector<uint8_t> img;
+		std::size_t index = 0;
+		if(i != 0)
+			index = collage.p_heights[i-1] * collage.p_widths[i-1] * 4;
+
+		for(index; index < collage.p_heights[i] * collage.p_widths[i] * 4; index++)
+		{
+			img.push_back(js_concat_pics[index]);
+		}
+		collage.images.push_back(img);
+	}
+
+	debug("API: CALL \n\t images\n\t\t " << collage.images.size() << std::endl);
+
 
 	try {
 		debug("API: CALL \n\t rescore_collage\n\t\t " << std::endl);
-		somhunter->rescore(scores, indices);
+		somhunter->rescore(collage);
 
 	} catch (const std::exception &e) {
 		Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();

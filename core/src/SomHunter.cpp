@@ -191,6 +191,13 @@ void SomHunter::rescore(const std::vector<_Float32> &collage_scores, const std::
 	                                 config.topn_frames_per_shot);	
 }
 
+void SomHunter::rescore(const Collage &collage)
+{
+	submitter.poll();
+	
+}
+
+
 bool
 SomHunter::som_ready() const
 {

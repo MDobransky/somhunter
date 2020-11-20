@@ -32,6 +32,7 @@
 #include "KeywordRanker.h"
 #include "RelevanceScores.h"
 #include "Submitter.h"
+#include "Collage.h"
 
 /* This is the main backend class. */
 
@@ -102,6 +103,7 @@ public:
 	 * computation and updates context.
 	 */
 	void rescore(const std::string &text_query);
+	void rescore(const Collage &collage);
 	void rescore(const std::vector<_Float32> &, const std::vector<size_t> &);
 
 	bool som_ready() const;

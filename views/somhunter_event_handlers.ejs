@@ -601,65 +601,105 @@ SOMHunter. If not, see <https://www.gnu.org/licenses/>.
 
   });
 
+  function get_raw_img(img) {
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    context.drawImage(img, 0, 0 );
+    var myData = context.getImageData(0, 0, img.width, img.height);
+    return Array.from(myData.data);
+  }
+
   function rescore_collage() {
     // Request input data
     const reqData = {
       "collectedImages": collectCollage(0),
       "topn": 1000,
     };
+    
 
-    let response = {};
-    let host = window.location.protocol + '//' + window.location.hostname // TODO: fix path from config
+    let first_collage = collectCollage(0);
+    let second_collage = collectCollage(1)
 
-    $.ajax({
-      type: 'POST',
-      dataType: 'json',
-      crossDomain: true,
-      url: host + ":8000/position_similarity/somhunter",
-      data: {
-        "data": JSON.stringify(reqData),
+    let lefts = [];
+    let tops = [];
+    let heights = [];
+    let widths = [];
+    let pics = [];
+    let pixel_widths = [];
+    let pixel_heights = [];
+    let first = [first_collage.length];
+  
+    for(i in first_collage){
+      lefts.push(first_collage[i].left);
+      tops.push(first_collage[i].top);
+      heights.push(first_collage[i].height);
+      widths.push(first_collage[i].width);
+      var img = new Image();
+      img.src = first_collage[i].src;
+      pixel_heights.push(img.height);
+      pixel_widths.push(img.width);
+      pics.push(get_raw_img(img));
+    }
+
+    for(i in second_collage){
+      lefts.push(second_collage[i].left);
+      tops.push(second_collage[i].top);
+      heights.push(second_collage[i].height);
+      widths.push(second_collage[i].width);
+      var img = new Image();
+      img.src = second_collage[i].src;
+      pixel_heights.push(img.height);
+      pixel_widths.push(img.width);
+      pics.push(get_raw_img(img));
+    }
+
+    console.log(pics)
+
+    let conc_pics = []
+    for(p in pics){
+      conc_pics = conc_pics.concat(pics[p])
+    }
+    console.log(conc_pics)
+
+
+
+    let body = {"pictures":conc_pics, "left": lefts, "top":tops, "width":widths, 
+                "height":heights, "pixel_width":pixel_widths, 
+                "pixel_height": pixel_heights, "break":first}
+
+    fetch("rescore_collage", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-      success(response) {
-        // Call SomHunter with Grizzly successful response
-        fetch("rescore_collage", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(response),
-        })
-          .then((res) => {
-            if (!res.ok) { throw Error(res.statusText); }
-            return res.json()
-          })
-          .then((data) => {
-            // Handle error
-            if (data.error) {
-              throw Error(data.error.message);
-            }
+      body: JSON.stringify(body),
+    })
+      .then((res) => {
+        if (!res.ok) { throw Error(res.statusText); }
+        return res.json()
+      })
+      .then((data) => {
+        // Handle error
+        if (data.error) {
+          throw Error(data.error.message);
+        }
 
-            // Now request new display
-            showTopDisplay();
-          })
-          .catch((e) => {
-            console.log("Error: " + JSON.stringify(e.message));
-            showGlobalMessage(
-              "Request failed!",
-              JSON.stringify(e.message),
-              5000,
-              "e"
-            );
-          });
-      },
-      error(resp) {
+        // Now request new display
+        showTopDisplay();
+      })
+      .catch((e) => {
+        console.log("Error: " + JSON.stringify(e.message));
         showGlobalMessage(
           "Request failed!",
-          "Grizzly error: " + resp.responseJSON['message'],
+          JSON.stringify(e.message),
           5000,
           "e"
         );
-      },
-    });
+      });
+      
+
   }
 
 </script>

@@ -210,7 +210,18 @@ exports.rescore_collage = function (req, res) {
   // Call the core
   global.core.addLikes(likes);
   global.core.removeLikes(unlikes);
-  global.core.rescore_collage(req.body.distances, req.body.idxs);
+
+// {"pictures":[[Uint8]], "left": [float], "top":[float], "width":[float], "height":[float], "pixel_width":[int], "pixel_height": [int], "break":[int]]}
+
+  global.core.rescore_collage(new Float32Array(req.body.left), 
+                              new Float32Array(req.body.top), 
+                              new Float32Array(req.body.height),
+                              new Float32Array(req.body.width), 
+                              new Int32Array(req.body.pixel_height),
+                              new Int32Array(req.body.pixel_width),
+                              new Int32Array(req.body.break),
+                              new Uint8Array(req.body.pictures)
+                              );
   // -------------------------------
 
   // Reset likes
