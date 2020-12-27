@@ -31,32 +31,32 @@
 
 #if LOGLEVEL > 0
 
-#define _dont_write_log                                                        \
+#define _dont_write_log_l                                                    \
 	do {                                                                   \
 	} while (0)
-#define _write_log(level, x)                                                   \
+#define _write_log_l(l, x)                                                   \
 	do {                                                                   \
-		std::cerr << level << x << "\n\t(" << __func__                 \
+		std::cerr << l << x << "\n\t(" << __func__                 \
 		          << " in " __FILE__ " :" << __LINE__ << ")"           \
 		          << std::endl;                                        \
 	} while (0)
 
-#define warn(x) _write_log("* ", x)
+#define warn_l(x) _write_log_l("* ", x)
 #else
-#define warn(x)
-#define _write_log(level, x)
+#define warn_l(x)
+#define _write_log_l(level, x)
 #endif
 
 #if LOGLEVEL > 1
-#define info(x) _write_log("- ", x)
+#define info_l(x) _write_log_l("- ", x)
 #else
-#define info(x) _dont_write_log
+#define info_l(x) _dont_write_log_l
 #endif
 
 #if LOGLEVEL > 2
-#define debug(x) _write_log(". ", x)
+#define debug_l(x) _write_log_l(". ", x)
 #else
-#define debug(x) _dont_write_log
+#define debug_l(x) _dont_write_log_l
 #endif
 
 #endif

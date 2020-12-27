@@ -115,9 +115,9 @@ som(size_t /*n*/,
     const std::vector<float> &scores,
     std::mt19937 &rng)
 {
-	info("build begin");
+	info_l("build begin");
 	std::discrete_distribution<size_t> random(scores.begin(), scores.end());
-	info("build end");
+	info_l("build end");
 
 	float thresholdA0 = radiiA[0];
 	float alphaA0 = alphasA[0];

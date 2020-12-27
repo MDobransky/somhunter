@@ -28,7 +28,7 @@ KeywordRanker::parse_kw_classes_text_file(const std::string &filepath)
 {
 	std::ifstream inFile(filepath.c_str(), std::ios::in);
 
-	info("loading keyword classes from " << filepath);
+	info_l("loading keyword classes from " << filepath);
 
 	if (!inFile) {
 		throw std::runtime_error("Error opening file: " + filepath);
@@ -86,7 +86,7 @@ KeywordRanker::parse_kw_classes_text_file(const std::string &filepath)
 	  result_keywords.begin(),
 	  result_keywords.end(),
 	  [](const Keyword &l, const Keyword &r) { return l.kw_ID < r.kw_ID; });
-	info("keyword classes loaded");
+	info_l("keyword classes loaded");
 
 	return result_keywords;
 }

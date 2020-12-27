@@ -7,8 +7,14 @@ find_package(Threads REQUIRED)
 find_package(CURL REQUIRED) 
 include_directories(${CURL_INCLUDE_DIR})
 
+# torch
+include_directories(/host/libtorch/include
+					/host/libtorch/include/torch/csrc/api/include
+					)
+
 SET(HEADERS
 	AsyncSom.h
+	CollageRanker.h
   	common.h
 	config_json.h
 	config.h
@@ -30,6 +36,7 @@ SET(HEADERS
 SET(SOURCES
 	${HEADERS}
 	AsyncSom.cpp
+	CollageRanker.cpp
 	SOM.cpp
 	DatasetFeatures.cpp
 	DatasetFrames.cpp

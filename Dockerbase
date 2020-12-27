@@ -4,8 +4,17 @@ FROM debian:testing-slim
 RUN apt-get -qq update
 RUN apt-get install -y --no-install-recommends \
       build-essential nodejs npm gyp libcurl4-openssl-dev pkg-config
+RUN  apt-get install -y python nano wget unzip
+
+
+# RUN wget https://download.pytorch.org/libtorch/nightly/cpu/libtorch-shared-with-deps-latest.zip
+# RUN unzip libtorch-shared-with-deps-latest.zip 
 
 RUN rm -fr /var/lib/apt /var/cache/apt
+
+WORKDIR /host/
+
+
 
 EXPOSE 8080
 

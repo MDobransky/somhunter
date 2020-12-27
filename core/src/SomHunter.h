@@ -27,12 +27,12 @@
 #include <vector>
 
 #include "AsyncSom.h"
+#include "CollageRanker.h"
 #include "DatasetFeatures.h"
 #include "DatasetFrames.h"
 #include "KeywordRanker.h"
 #include "RelevanceScores.h"
 #include "Submitter.h"
-#include "Collage.h"
 
 /* This is the main backend class. */
 
@@ -43,6 +43,7 @@ class SomHunter
 	const DatasetFeatures features;
 	const KeywordRanker keywords;
 	const Config config;
+	CollageRanker collageRanker;
 
 	// *** SEARCH CONTEXT ***
 	// Relevance scores

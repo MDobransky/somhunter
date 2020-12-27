@@ -43,7 +43,7 @@ submitter_thread(const std::string &submit_url,
 		std::filesystem::create_directory(cfg.VBS_submit_archive_dir);
 
 	if (!std::filesystem::is_directory(cfg.VBS_submit_archive_dir))
-		warn("wtf, directory was not created");
+		warn_l("wtf, directory was not created");
 
 	{
 		std::string path = cfg.VBS_submit_archive_dir +
@@ -52,7 +52,7 @@ submitter_thread(const std::string &submit_url,
 		                   cfg.VBS_submit_archive_log_suffix;
 		std::ofstream o(path.c_str(), std::ios::app);
 		if (!o) {
-			warn("Could not write a log file!");
+			warn_l("Could not write a log file!");
 		} else {
 			o << "{"
 			  << "\"query_string\": \"" << query << "\","
@@ -110,9 +110,9 @@ submitter_thread(const std::string &submit_url,
 		bool curl_ok = curl_easy_perform(curl) == 0u;
 
 		if (curl_ok)
-			info("Submit OK");
+			info_l("Submit OK");
 		else
-			warn("Submit failed!");
+			warn_l("Submit failed!");
 
 		curl_easy_cleanup(curl);
 	}

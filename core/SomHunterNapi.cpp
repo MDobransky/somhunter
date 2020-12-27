@@ -21,7 +21,7 @@
 #include "common.h"
 
 #include "SomHunterNapi.h"
-#include "Collage.h"
+#include "CollageRanker.h"
 
 #include <stdexcept>
 #include <vector>
@@ -61,7 +61,7 @@ SomHunterNapi::Init(Napi::Env env, Napi::Object exports)
 SomHunterNapi::SomHunterNapi(const Napi::CallbackInfo &info)
   : Napi::ObjectWrap<SomHunterNapi>(info)
 {
-	debug("API: Instantiating SomHunter...");
+	debug_l("API: Instantiating SomHunter...");
 
 	Napi::Env env = info.Env();
 	Napi::HandleScope scope(env);
@@ -79,7 +79,7 @@ SomHunterNapi::SomHunterNapi(const Napi::CallbackInfo &info)
 	Config cfg = Config::parse_json_config(config_fpth);
 	try {
 		somhunter = new SomHunter(cfg);
-		debug("API: SomHunter initialized.");
+		debug_l("API: SomHunter initialized.");
 	} catch (const std::exception &e) {
 		Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
 	}
@@ -125,7 +125,7 @@ SomHunterNapi::get_display(const Napi::CallbackInfo &info)
 	// Call native method
 	FramePointerRange display_frames;
 	try {
-		debug("API: CALL \n\t get_display\n\t\tdisp_type = "
+		debug_l("API: CALL \n\t get_display\n\t\tdisp_type = "
 		      << int(disp_type) << std::endl
 		      << "n\t\t selected_image = " << selected_image
 		      << std::endl
@@ -134,7 +134,7 @@ SomHunterNapi::get_display(const Napi::CallbackInfo &info)
 		display_frames =
 		  somhunter->get_display(disp_type, selected_image, page_num);
 
-		debug("API: RETURN \n\t get_display\n\t\tframes.size() = "
+		debug_l("API: RETURN \n\t get_display\n\t\tframes.size() = "
 		      << display_frames.size());
 	} catch (const std::exception &e) {
 		Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
@@ -278,7 +278,7 @@ SomHunterNapi::add_likes(const Napi::CallbackInfo &info)
 	}
 
 	try {
-		debug("API: CALL \n\t add_likes\n\t\fr_IDs.size() = "
+		debug_l("API: CALL \n\t add_likes\n\t\fr_IDs.size() = "
 		      << fr_IDs.size() << std::endl);
 
 		somhunter->add_likes(fr_IDs);
@@ -306,7 +306,7 @@ SomHunterNapi::rescore(const Napi::CallbackInfo &info)
 	std::string query{ info[0].As<Napi::String>().Utf8Value() };
 
 	try {
-		debug("API: CALL \n\t rescore\n\t\t query =  " << query
+		debug_l("API: CALL \n\t rescore\n\t\t query =  " << query
 		                                               << std::endl);
 		somhunter->rescore(query);
 
@@ -320,7 +320,7 @@ SomHunterNapi::rescore(const Napi::CallbackInfo &info)
 Napi::Value
 SomHunterNapi::rescore_collage(const Napi::CallbackInfo &info)
 {
-	debug("API: CALL \n\t rescore_collage\n\t\t query " << std::endl);
+	debug_l("API: CALL \n\t rescore_collage\n\t\t query " << std::endl);
 	
 	Napi::Env env = info.Env();
 	Napi::HandleScope scope(env);
@@ -371,11 +371,11 @@ SomHunterNapi::rescore_collage(const Napi::CallbackInfo &info)
 		collage.images.push_back(img);
 	}
 
-	debug("API: CALL \n\t images\n\t\t " << collage.images.size() << std::endl);
+	debug_l("API: CALL \n\t images\n\t\t " << collage.images.size() << std::endl);
 
 
 	try {
-		debug("API: CALL \n\t rescore_collage\n\t\t " << std::endl);
+		debug_l("API: CALL \n\t rescore_collage\n\t\t " << std::endl);
 		somhunter->rescore(collage);
 
 	} catch (const std::exception &e) {
@@ -400,7 +400,7 @@ SomHunterNapi::reset_all(const Napi::CallbackInfo &info)
 		  .ThrowAsJavaScriptException();
 	}
 	try {
-		debug("API: CALL \n\t reset_all()");
+		debug_l("API: CALL \n\t reset_all()");
 
 		somhunter->reset_search_session();
 
@@ -435,7 +435,7 @@ SomHunterNapi::remove_likes(const Napi::CallbackInfo &info)
 	}
 
 	try {
-		debug("API: CALL \n\t add_likes\n\t\fr_IDs.size() = "
+		debug_l("API: CALL \n\t add_likes\n\t\fr_IDs.size() = "
 		      << fr_IDs.size() << std::endl);
 
 		somhunter->add_likes(fr_IDs);
@@ -569,11 +569,11 @@ SomHunterNapi::is_som_ready(const Napi::CallbackInfo &info)
 
 	bool is_ready{ false };
 	try {
-		debug("API: CALL \n\t som_ready()");
+		debug_l("API: CALL \n\t som_ready()");
 
 		is_ready = somhunter->som_ready();
 
-		debug(
+		debug_l(
 		  "API: RETURN \n\t som_ready()\n\t\tis_ready = " << is_ready);
 
 	} catch (const std::exception &e) {
@@ -603,7 +603,7 @@ SomHunterNapi::submit_to_server(const Napi::CallbackInfo &info)
 	ImageId frame_ID{ info[0].As<Napi::Number>().Uint32Value() };
 
 	try {
-		debug("API: CALL \n\t submit_to_server\n\t\frame_ID = "
+		debug_l("API: CALL \n\t submit_to_server\n\t\frame_ID = "
 		      << frame_ID);
 
 		somhunter->submit_to_server(frame_ID);
