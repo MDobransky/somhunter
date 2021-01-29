@@ -5,7 +5,10 @@ find_package(Threads REQUIRED)
 
 # cURL
 find_package(CURL REQUIRED) 
-include_directories(${CURL_INCLUDE_DIR})
+include_directories(
+	${CURL_INCLUDE_DIR}
+	.
+)
 
 # torch
 include_directories(/host/libtorch/include
@@ -31,6 +34,7 @@ SET(HEADERS
 	utils.h
 	log.h
 	json11.hpp
+	ImageManipulator.h
 )
 
 SET(SOURCES
@@ -46,6 +50,7 @@ SET(SOURCES
 	Submitter.cpp
 	main.cpp
 	json11.cpp
+	ImageManipulator.cpp
 )
 
 #create the program
