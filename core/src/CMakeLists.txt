@@ -5,10 +5,19 @@ find_package(Threads REQUIRED)
 
 # cURL
 find_package(CURL REQUIRED) 
-include_directories(${CURL_INCLUDE_DIR})
+include_directories(
+	${CURL_INCLUDE_DIR}
+	.
+)
+
+# torch
+include_directories(/host/libtorch/include
+					/host/libtorch/include/torch/csrc/api/include
+					)
 
 SET(HEADERS
 	AsyncSom.h
+	CollageRanker.h
   	common.h
 	config_json.h
 	config.h
@@ -25,11 +34,16 @@ SET(HEADERS
 	utils.h
 	log.h
 	json11.hpp
+	ImageManipulator.h
+	stb_image_resize.h
+	stb_image_write.h
+	stb_image.h
 )
 
 SET(SOURCES
 	${HEADERS}
 	AsyncSom.cpp
+	CollageRanker.cpp
 	SOM.cpp
 	DatasetFeatures.cpp
 	DatasetFrames.cpp
@@ -39,6 +53,7 @@ SET(SOURCES
 	Submitter.cpp
 	main.cpp
 	json11.cpp
+	ImageManipulator.cpp
 )
 
 #create the program

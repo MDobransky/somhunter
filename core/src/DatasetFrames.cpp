@@ -32,7 +32,7 @@ DatasetFrames::parse_top_kws_for_imgs_text_file(const std::string &filepath)
 {
 	std::ifstream inFile(filepath.c_str(), std::ios::in);
 
-	info("Loading top image keywords from " << filepath);
+	info_l("Loading top image keywords from " << filepath);
 	if (!inFile) {
 		throw std::runtime_error("Error opening file: " + filepath);
 	}
@@ -70,7 +70,7 @@ DatasetFrames::parse_top_kws_for_imgs_text_file(const std::string &filepath)
 		++line_idx;
 	}
 
-	info("Top keywords loaded OK");
+	info_l("Top keywords loaded OK");
 	return result_vec;
 }
 
@@ -80,11 +80,11 @@ DatasetFrames::DatasetFrames(const Config &config)
 	frames_path_prefix = config.frames_path_prefix;
 	offs = config.filename_offsets;
 
-	info("Loading image paths");
+	info_l("Loading image paths");
 
 	std::ifstream in(config.frames_list_file);
 	if (!in.good()) {
-		warn("Failed to open " << config.frames_list_file);
+		warn_l("Failed to open " << config.frames_list_file);
 		throw std::runtime_error("missing image list");
 	}
 
@@ -140,9 +140,9 @@ DatasetFrames::DatasetFrames(const Config &config)
 	}
 
 	if (size() == 0u)
-		warn("No image paths loaded");
+		warn_l("No image paths loaded");
 	else
-		info("Loaded " << size() << " image paths");
+		info_l("Loaded " << size() << " image paths");
 }
 
 VideoFrame

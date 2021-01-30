@@ -35,7 +35,7 @@ AsyncSom::async_som_worker(AsyncSom *parent, const Config &cfg)
 	std::random_device rd;
 	std::mt19937 rng(rd());
 
-	info("SOM worker starting");
+	info_l("SOM worker starting");
 
 	while (!parent->terminate) {
 
@@ -59,7 +59,7 @@ AsyncSom::async_som_worker(AsyncSom *parent, const Config &cfg)
 			n = scores.size();
 			parent->new_data = false;
 			parent->m_ready = false;
-			info("SOM worker got new work");
+			info_l("SOM worker got new work");
 		}
 
 		if (parent->new_data || parent->terminate)
@@ -149,7 +149,7 @@ AsyncSom::async_som_worker(AsyncSom *parent, const Config &cfg)
 		 * may break in the middle
 		 */
 	}
-	info("SOM worker terminating");
+	info_l("SOM worker terminating");
 }
 
 AsyncSom::AsyncSom(const Config &cfg)
@@ -160,11 +160,11 @@ AsyncSom::AsyncSom(const Config &cfg)
 
 AsyncSom::~AsyncSom()
 {
-	info("requesting SOM worker termination");
+	info_l("requesting SOM worker termination");
 	terminate = true;
 	new_data_wakeup.notify_all();
 	worker.join();
-	info("SOM worker terminated");
+	info_l("SOM worker terminated");
 }
 
 void

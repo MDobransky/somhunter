@@ -26,6 +26,7 @@
 #include "log.h"
 #include "utils.h"
 
+
 FramePointerRange
 SomHunter::get_display(DisplayType d_type, ImageId selected_image, PageId page)
 {
@@ -51,7 +52,7 @@ SomHunter::get_display(DisplayType d_type, ImageId selected_image, PageId page)
 			return get_topKNN_display(selected_image, page);
 
 		default:
-			warn("Unsupported display requested.");
+			warn_l("Unsupported display requested.");
 #ifndef NDEBUG
 			throw std::runtime_error(
 			  "Unsupported display requested.");
@@ -135,9 +136,9 @@ SomHunter::rescore(const std::string &text_query)
 	                          config.topn_frames_per_video,
 	                          config.topn_frames_per_shot);
 
-	debug("used_tools.topknn_used = " << used_tools.topknn_used);
-	debug("used_tools.KWs_used = " << used_tools.KWs_used);
-	debug("used_tools.bayes_used = " << used_tools.bayes_used);
+	debug_l("used_tools.topknn_used = " << used_tools.topknn_used);
+	debug_l("used_tools.KWs_used = " << used_tools.KWs_used);
+	debug_l("used_tools.bayes_used = " << used_tools.bayes_used);
 	submitter.submit_and_log_rescore(frames,
 	                                 scores,
 	                                 used_tools,
@@ -150,7 +151,7 @@ SomHunter::rescore(const std::string &text_query)
 
 void SomHunter::rescore(const std::vector<_Float32> &collage_scores, const std::vector<size_t> &indices)
 {
-	debug("API: CALL \n\t rescore scores" << std::endl);
+	debug_l("API: CALL \n\t rescore scores" << std::endl);
 	submitter.poll();
 	reset_scores(0.0f);
 
@@ -178,9 +179,9 @@ void SomHunter::rescore(const std::vector<_Float32> &collage_scores, const std::
 	                          config.topn_frames_per_video,
 	                          config.topn_frames_per_shot);
 
-	// debug("used_tools.topknn_used = " << used_tools.topknn_used);
-	// debug("used_tools.KWs_used = " << used_tools.KWs_used);
-	// debug("used_tools.bayes_used = " << used_tools.bayes_used);
+	// debug_l("used_tools.topknn_used = " << used_tools.topknn_used);
+	// debug_l("used_tools.KWs_used = " << used_tools.KWs_used);
+	// debug_l("used_tools.bayes_used = " << used_tools.bayes_used);
 	submitter.submit_and_log_rescore(frames,
 	                                 scores,
 	                                 used_tools,
@@ -191,9 +192,10 @@ void SomHunter::rescore(const std::vector<_Float32> &collage_scores, const std::
 	                                 config.topn_frames_per_shot);	
 }
 
-void SomHunter::rescore(const Collage &collage)
+void SomHunter::rescore(Collage &collage)
 {
 	submitter.poll();
+	collageRanker.score(collage);
 	
 }
 
@@ -277,7 +279,7 @@ SomHunter::get_topn_display(PageId page)
 {
 	// Another display or first page -> load
 	if (current_display_type != DisplayType::DTopN || page == 0) {
-		debug("Loading top n display first page");
+		debug_l("Loading top n display first page");
 		// Get ids
 		auto ids = scores.top_n(frames,
 		                        TOPN_LIMIT,
@@ -300,7 +302,7 @@ SomHunter::get_topn_context_display(PageId page)
 {
 	// Another display or first page -> load
 	if (current_display_type != DisplayType::DTopNContext || page == 0) {
-		debug("Loading top n context display first page");
+		debug_l("Loading top n context display first page");
 		// Get ids
 		auto ids =
 		  scores.top_n_with_context(frames,
@@ -365,7 +367,7 @@ SomHunter::get_video_detail_display(ImageId selected_image)
 	VideoId v_id = frames.get_video_id(selected_image);
 
 	if (v_id == VIDEO_ID_ERR_VAL) {
-		warn("Video for " << selected_image << " not found");
+		warn_l("Video for " << selected_image << " not found");
 		return std::vector<VideoFramePointer>();
 	}
 
@@ -392,14 +394,14 @@ SomHunter::get_topKNN_display(ImageId selected_image, PageId page)
 {
 	// Another display or first page -> load
 	if (current_display_type != DisplayType::DTopKNN || page == 0) {
-		debug("Getting KNN for image " << selected_image);
+		debug_l("Getting KNN for image " << selected_image);
 		// Get ids
 		auto ids = features.get_top_knn(frames,
 		                                selected_image,
 		                                config.topn_frames_per_video,
 		                                config.topn_frames_per_shot);
 
-		debug("Got result of size " << ids.size());
+		debug_l("Got result of size " << ids.size());
 		// Log
 		submitter.log_show_topknn_display(frames, selected_image, ids);
 
@@ -407,7 +409,7 @@ SomHunter::get_topKNN_display(ImageId selected_image, PageId page)
 		current_display = frames.ids_to_video_frame(ids);
 		current_display_type = DisplayType::DTopKNN;
 
-		debug("Context is ready");
+		debug_l("Context is ready");
 
 		// KNN is query by example so we NEED to log a rerank
 		UsedTools ut;
@@ -422,7 +424,7 @@ SomHunter::get_topKNN_display(ImageId selected_image, PageId page)
 		                                 config.topn_frames_per_video,
 		                                 config.topn_frames_per_shot);
 
-		debug("Logging is done");
+		debug_l("Logging is done");
 	}
 
 	return get_page_from_last(page);
@@ -431,7 +433,7 @@ SomHunter::get_topKNN_display(ImageId selected_image, PageId page)
 FramePointerRange
 SomHunter::get_page_from_last(PageId page)
 {
-	debug("Getting page "
+	debug_l("Getting page "
 	      << page << ", page size " << config.display_page_size
 	      << ", current display size " << current_display.size());
 

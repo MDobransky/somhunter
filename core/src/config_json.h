@@ -102,7 +102,7 @@ Config::parse_json_config(const std::string &filepath)
 	std::ifstream ifs{ filepath };
 	if (!ifs.is_open()) {
 		std::string msg{ "Error opening file: " + filepath };
-		warn(msg);
+		warn_l(msg);
 		throw std::runtime_error(msg);
 	}
 
@@ -121,7 +121,7 @@ Config::parse_json_config(const std::string &filepath)
 	if (!err.empty()) {
 		std::string msg{ "Error parsing JSON config file: " +
 			         filepath };
-		warn(msg);
+		warn_l(msg);
 		throw std::runtime_error(msg);
 	}
 
