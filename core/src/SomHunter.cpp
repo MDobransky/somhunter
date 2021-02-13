@@ -149,49 +149,6 @@ SomHunter::rescore(const std::string &text_query)
 	                                 config.topn_frames_per_shot);
 }
 
-void SomHunter::rescore(const std::vector<_Float32> &collage_scores, const std::vector<size_t> &indices)
-{
-	debug_l("API: CALL \n\t rescore scores" << std::endl);
-	submitter.poll();
-	reset_scores(0.0f);
-
-	// Rescore text query
-	// keywords.rank_sentence_query(query, scores, features, frames, config);
-
-	for (size_t i = 0; i < indices.size(); ++i) {
-		if(indices[i] >= scores.size()) {
-			continue;
-		}
-		scores.set(indices[i], 1 - collage_scores[i]);
-	}
-
-	// Update search context
-	shown_images.clear();
-
-	// Reset likes
-	likes.clear();
-	for (auto &fr : frames) {
-		fr.liked = false;
-	}
-
-	auto top_n = scores.top_n(frames,
-	                          TOPN_LIMIT,
-	                          config.topn_frames_per_video,
-	                          config.topn_frames_per_shot);
-
-	// debug_l("used_tools.topknn_used = " << used_tools.topknn_used);
-	// debug_l("used_tools.KWs_used = " << used_tools.KWs_used);
-	// debug_l("used_tools.bayes_used = " << used_tools.bayes_used);
-	submitter.submit_and_log_rescore(frames,
-	                                 scores,
-	                                 used_tools,
-	                                 current_display_type,
-	                                 top_n,
-	                                 last_text_query,
-	                                 config.topn_frames_per_video,
-	                                 config.topn_frames_per_shot);	
-}
-
 void SomHunter::rescore(Collage &collage)
 {
 	submitter.poll();

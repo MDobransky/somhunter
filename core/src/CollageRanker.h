@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <torch/torch.h>
 #include <torch/script.h>
+#include <torch/linalg.h>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -102,7 +103,7 @@ public:
 class CollageRanker
 {
 	public:
-		CollageRanker();
+		CollageRanker(const Config &config);
 		void score(Collage&);
 
 	private:
@@ -110,8 +111,11 @@ class CollageRanker
 		torch::jit::script::Module resnext101;
 		torch::Tensor bias;
     	torch::Tensor weights;
+		torch::Tensor kw_pca_mat;
+		torch::Tensor kw_pca_mean_vec;
 
 		at::Tensor get_features(Collage&);
+		at::Tensor get_L2norm(at::Tensor data);
 };
 
 #endif

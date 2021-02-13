@@ -1,9 +1,12 @@
 #include "CollageRanker.h"
 #include "ImageManipulator.h"
 #include <string>
+#include <torch/linalg.h>
+#include <math.h>
 
-CollageRanker::CollageRanker()
+CollageRanker::CollageRanker(const Config &config)
 {
+
     try 
     {
         resnet152 = torch::jit::load("models/traced_Resnet152.pt");
@@ -40,40 +43,47 @@ CollageRanker::CollageRanker()
         std::cerr << "error loading 4096 -> 2048 weights\n";
     }
 
-
+    kw_pca_mat = torch::tensor(KeywordRanker::parse_float_vector(config.kw_PCA_mat_file, config.pre_PCA_features_dim * config.kw_PCA_mat_dim)).reshape({config.kw_PCA_mat_dim, config.pre_PCA_features_dim}).permute({1, 0});
+	kw_pca_mean_vec = torch::tensor(KeywordRanker::parse_float_vector(config.kw_bias_vec_file, config.pre_PCA_features_dim));
 }
 
 void CollageRanker::score(Collage& collage)
 {
-    /**
-     * ditch 4.th channel
-     * resize images to 224x224
-     * infer features
-     * do pca
-     * compare with db
-     * average scores
-     * split on temporal q
-     */
-   
-    collage.RGBA_to_BGR();
-    collage.resize_all(224, 224);
-    // collage.print();
+    if(collage.images.size() > 0)
+    {
+        collage.RGBA_to_BGR();
+        collage.resize_all(224, 224);
 
-    at::Tensor feature = get_features(collage);
+        at::Tensor feature = get_features(collage);
 
-    std::cout << feature << "\n";
+    }
 }
 
 
-// returns 2048 dim vector for each image in collage
+// in 1st dim
+at::Tensor CollageRanker::get_L2norm(at::Tensor data)
+{
+    at::Tensor norm = torch::zeros({data.sizes()[0], 1});
+
+    for(size_t i = 0; i < data.sizes()[0]; i++)
+        norm[i] = torch::sqrt(torch::sum(data[i] *  data[i]));
+    
+    return norm;
+}
+
+
+// returns 2048 dim normed vector for each image in collage
 at::Tensor CollageRanker::get_features(Collage& collage)
 {
+    debug_l("Extracting features\n");
+
     std::vector<torch::Tensor> tensors;
     std::vector<torch::Tensor> tensors_norm;
 
     float means[] = {123.68, 116.779, 103.939}; 
     torch::Tensor t_means = torch::from_blob(means, {3}).unsqueeze_(0).unsqueeze_(0);
 
+    // get data, no adjustements for resnet, normed for resnext
     for(std::size_t i = 0; i < collage.images.size(); i++)
     {
 
@@ -95,8 +105,24 @@ at::Tensor CollageRanker::get_features(Collage& collage)
 
     at::Tensor feature = torch::cat({resnext101_feature, resnet152_feature}, 1).to(torch::kFloat32).detach();
     
+    // squeeze 4096 to 2048
     feature = feature.unsqueeze(0).permute({1, 0, 2});
     feature =  torch::tanh(torch::matmul(feature, weights).squeeze(1) + bias);
+
+    // norm
+    feature = torch::div(feature, get_L2norm(feature));
+
+    debug_l("normalized\n");
+
+    // PCA
+    feature = feature - kw_pca_mean_vec;
+    feature = feature.unsqueeze(0).permute({1, 0, 2});
+    feature = torch::matmul(feature, kw_pca_mat).squeeze(1);
+
+    // norm
+    feature = torch::div(feature, get_L2norm(feature));
+
+    std::cout << feature << "\n";
 
     return feature;
 

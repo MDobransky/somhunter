@@ -77,6 +77,7 @@ public:
 	  , features(frames, cfg)
 	  , scores(frames)
 	  , keywords(cfg)
+	  , collageRanker(cfg)
 	  , asyncSom(cfg)
 	  , submitter(cfg.submitter_config)
 	{
@@ -106,7 +107,6 @@ public:
 	 */
 	void rescore(const std::string &text_query);
 	void rescore(Collage &collage);
-	void rescore(const std::vector<_Float32> &, const std::vector<size_t> &);
 
 	bool som_ready() const;
 
